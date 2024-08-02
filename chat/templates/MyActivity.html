@@ -1,0 +1,127 @@
+
+{% extends "Home_empty.html" %}
+{%block body%}
+{% load static %}
+<style>
+  .main{
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #00458911;
+    padding: 50px;
+  }
+  .zmatb{
+    width: 100%;
+  }
+  .zmatb th,td{
+    width: 50%;
+  }
+</style>
+
+<div class="w-100">
+  <div class="text-white m-4 d-flex flex-column main mx-auto">
+    <div class="d-flex align-items-center">
+      <div>
+        <div class="zpfcircle" style="width: 100px; height: 100px;">
+          <img style="width: 100%; min-height: 100%; height: auto" src="{% static profile.pfp %}" alt="Profile Picture" />
+        </div>
+      </div>
+      <div class="ms-4">
+        <h2>{{profile.nickname}}</h2>
+        <h4>{{profile.user.username}}#{{profile.user.id}}</h4>
+      </div>
+    </div>
+    <div>
+      
+
+      <h4 class="mt-5">Account Details</h4>
+      <table class="zmatb">
+        <tbody>
+          <tr>
+            <th>Username</th><td>{{profile.user.username}}</td>
+          </tr>
+          <tr>
+            <th>UserID</th><td>#{{profile.user.id}}</td>
+          </tr>
+          <tr>
+            <th>Nickname</th><td>{{profile.nickname}}</td>
+          </tr>
+          <tr>
+            <th>E-mail</th><td>{{profile.user.email}}</td>
+          </tr>
+          <tr>
+            <th>Date Joined</th><td>{{profile.user.date_joined}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 class="mt-5">Social Profile</h4>
+      <table class="zmatb">
+        <tbody>
+          <tr>
+            <th>User Handle</th><td>{{profile.nickname}}</td>
+          </tr>
+          <tr>
+            <th>Followers</th><td>{{profile.followercount}}</td>
+          </tr>
+          <tr>
+            <th>Following</th><td>{{profile.followingcount}}</td>
+          </tr>
+          <tr>
+            <th>Bio</th><td>{{profile.bio}}</td>
+          </tr>
+          <tr>
+            <th>Status</th><td>{{profile.status}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 class="mt-5">Post History</h4>
+      <table class="zmatb">
+        <tbody>
+          <tr>
+            <th>Total Posts</th><td>{{profile.postcount}}</td>
+          </tr>
+          <tr>
+            <th>Likes Received</th><td>{{total_likes}}</td>
+          </tr>
+          <tr>
+            <th>Likes Given</th><td>{{likes_given}}</td>
+          </tr>
+          <tr>
+            <th>Comments Received</th><td>{{total_cmt}}</td>
+          </tr>
+          <tr>
+            <th>Comments Wrote</th><td>{{cmt_given}}</td>
+          </tr>
+          <tr>
+            <th>Comment Likes</th><td>{{cmt_likes}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 class="mt-5">Chat History</h4>
+      <table class="zmatb">
+        <tbody>
+          <tr>
+            <th>Messages Sent</th><td>{{msg_sent}} Messages to {{msg_sent_users}} Users and {{gm_sent}} messages to {{gm_sent_gc}} groups</td>
+          </tr>
+          <tr>
+            <th>Messages Recieved</th><td>{{msg_rec}} Messages from {{msg_rec_users}} Users and {{gm_rec}} messages from {{gm_rec_gc}} groups</td>
+          </tr>
+          <tr>
+            <th>Groups Created</th><td>{{gc_created}}</td>
+          </tr>
+          <tr>
+            <th>Groups Under Moderation</th><td>{{gc_mod}}</td>
+          </tr>
+          <tr>
+            <th>Groups joined</th><td>{{gc_joined}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div><br>
+    <a href="{% url 'explore' %}" class="zhov-white" > < Back to Echotext</a>
+  </div>
+</div>
+{% endblock %}

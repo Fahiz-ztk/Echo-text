@@ -1,0 +1,85 @@
+
+{% extends "Home_empty.html" %}
+{%block body%}
+{% load static %}
+<style>
+  body{
+    height: 100vh;
+    width: 100vw;
+    
+  }
+</style>
+<div class="text-white w-100 h-100">
+  
+      <div class="zbg1 text-center row w-100 m-0" style="z-index: 2; height: 50px;position: fixed;">
+             <div class="col-6"><label id="foler" class="ztabbertop ztabbed" for="ztab1"></i>followers</label></div>
+             <div class="col-6"><label id="folin" class="ztabbertop" for="ztab2"></i>Following</label></div>
+         </div>
+        </div>
+     </div>
+  
+     <ul class="ztabs">
+      <li class="ztab">
+        <input type="radio" name="ztabs" checked id="ztab1" onchange="tabbery(1)" />
+        <div id="ztab-content4" class="content">
+     <div style="height: 50px;"></div>
+          
+          {% for i in followers %}
+            <div class="m-1 zbg7 text-white p-1" style="width: 100%; height: 100px;">
+                    <div class="mx-auto d-flex" style="max-width: 80%;">
+                        <div class="zpfcircle" style="width: 90px; height: 90px;">
+                            <img style="width: 100%; min-height: 100%; height: auto" src="{% static i.pfp %}"
+                                alt="" />
+                        </div>
+                        <div class=" d-flex flex-column ps-3">
+                            <h5 class=""><b>{{i.nickname}}</b></h5>
+                            <p class="">{{i.user.username}}#{{i.user.id}}</p>
+                        </div>
+                    </div>
+            </div>
+          {% endfor %}
+  
+        </div>
+      </li>
+      <li class="ztab">
+        <input type="radio"  name="ztabs" id="ztab2" onchange="tabbery(2)" />
+        <div id="ztab-content4" class="content">
+     <div style="height: 50px;"></div>
+                  
+          {% for i in following %}
+            <div class="m-1 zbg7 text-white p-1" style="width: 100%; height: 100px;">
+                    <div class="mx-auto d-flex" style="max-width: 80%;">
+                        <div class="zpfcircle" style="width: 90px; height: 90px;">
+                            <img style="width: 100%; min-height: 100%; height: auto" src="{% static i.pfp %}"
+                                alt="" />
+                        </div>
+                        <div class=" d-flex flex-column ps-3">
+                            <h5 class=""><b>{{i.nickname}}</b></h5>
+                            <p class="">{{i.user.username}}#{{i.user.id}}</p>
+                        </div>
+                    </div>
+            </div>
+          {% endfor %}
+  
+        </div>
+      </li>
+     </ul>
+
+     <script>
+      t1=document.getElementById("foler")
+      t2=document.getElementById("folin")
+      function tabbery(tb){
+        if (tb==1){
+          t1.classList.add('ztabbed');
+          t2.classList.remove('ztabbed');
+        }
+        else{
+          t2.classList.add('ztabbed');
+          t1.classList.remove('ztabbed');
+        }
+
+      }
+     </script>
+  
+</div>
+{% endblock %}

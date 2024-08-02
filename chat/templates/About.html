@@ -1,0 +1,113 @@
+
+{% extends "Home_empty.html" %}
+{%block body%}
+
+    <style>
+            .about-echotext {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            }
+
+            .about-echotext h1 {
+            text-align: center;
+            color: #325556;
+            margin-bottom: 20px;
+            }
+
+            .about-echotext h2 {
+            color: #00adb5;
+            margin-top: 20px;
+            border-bottom: 2px solid #00adb5;
+            padding-bottom: 5px;
+            }
+
+            .about-echotext p {
+            margin: 10px 0;
+            }
+
+            .about-echotext ul {
+            list-style-type: none;
+            padding: 0;
+            }
+
+            .about-echotext ul li {
+            margin: 5px 0;
+            }
+
+            .about-echotext a {
+            color: #0285d7;
+            text-decoration: none;
+            }
+
+            .about-echotext a:hover {
+            text-decoration: underline;
+            }
+
+    </style>
+
+    <div class="about-echotext text-white">
+        <h1>About echotext</h1>
+      
+        <section class="app-info">
+          <h2>App Information</h2>
+          <p>echotext is a dynamic social media platform designed to connect people from around the world. With echotext, you can share moments, connect with friends, join communities, and stay updated with the latest trends and news.</p>
+        </section>
+      
+        <section class="company-info">
+          <h2>Company Information</h2>
+          <p>echotext was founded in 2021 with the mission to create a space where everyone can voice their thoughts and connect with others. Our team is dedicated to continuously improving your social media experience by integrating innovative features and maintaining a user-friendly interface.</p>
+        </section>
+      
+        <section class="version-info">
+          <h2>Version Information</h2>
+          <p>You are currently using echotext version 2.5.0. Check out the <a href="#">Changelog</a> for details on the latest updates and improvements.</p>
+        </section>
+      
+        <section class="legal-info">
+          <h2>Legal Information</h2>
+          <ul>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </section>
+      
+        <section class="contact-info">
+          <h2>Contact Information</h2>
+          <p>Need help or have any questions? Reach out to our support team:</p>
+          <ul>
+            <li>Email: <a href="mailto:support@echotext.com">support@echotext.com</a></li>
+            <li><a href="#">Support Center</a></li>
+          </ul>
+        </section>
+      
+        <section class="acknowledgements">
+          <h2>Acknowledgements</h2>
+          <p>echotext was built using a variety of amazing open-source libraries and frameworks. We would like to thank the developers and contributors of these projects for their invaluable work.</p>
+        </section>
+      
+        <section class="social-media-links">
+          <h2>Social Media Links</h2>
+          <p>Stay connected with echotext:</p>
+          <ul>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Instagram</a></li>
+          </ul>
+        </section>
+      
+        <section class="press-media">
+          <h2>Press/Media</h2>
+          <p>For press inquiries, please visit our <a href="#">Press Page</a> or contact <a href="mailto:press@echotext.com">press@echotext.com</a>. Check out our latest <a href="#">Blog Posts</a> and <a href="#">Media Coverage</a>.</p>
+        </section>
+        <a href="{% url 'explore' %}" class="zhov-white" > < Back to Echotext</a>
+
+      </div>
+      
+      
+      
+      {% endblock %}

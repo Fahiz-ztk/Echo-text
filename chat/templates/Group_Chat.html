@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat with {{ group.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
+    <script src="https://kit.fontawesome.com/b7f5da0622.js" crossorigin="anonymous"></script>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'chat/statics/css/theme.css' %}" />
+    <style>
+        body {
+            background: #222831 url("/static/chat/statics/wallp/what.png");
+            background-size: 500px;
+            
+        }
+    </style>
+</head>
+
+<body onload="refresh()" class="w-100 m-0">
+    <nav class="navbar zbg1 fixed-top" style="height: fit-content">
+        <div class="container-fluid">
+            <div class="navbar-brand text-white d-flex w-100">
+                <a href="{% url 'explore_tab' 'groups' %}"
+                    style="color: #00adb5; float: left; text-align: center; padding: 15px 10px 15px;">
+                    <i class="fa-solid fa-chevron-left text-center fa-2x zhov-white"></i>
+                </a>
+                <a data-bs-toggle="modal" data-bs-target="#gcModal">
+                    <div class="zpfcircle" style="height: 80px; width: 80px; float: left;">
+                        <img class="zpfimg" src="{% static group.icon %}" alt="" />
+                    </div>
+                </a>
+                <div style="width: 30px; height: 70px; float: left;"></div>
+                <div style="max-width: 0%;">
+                    <h4 style="padding-top: 8px;">{{ group.name }}</h4>
+                    <p style="font-style: italic; font-size: medium; color: #bcbcbc">
+                        {% for i in group.gcmembers %} {{ i.nickname }}, {% endfor %}
+                    </p>
+                </div>
+                <div class="flex-grow-1 pt-4" style="min-width: fit-content;">
+                    <button class="zhov-white zinvut" style="float: right;" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                        <i class="fa-solid fa-bars" style="font-size: larger;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas offcanvas-end zbg2 text-white" tabindex="-1" id="offcanvasRight"
+            aria-labelledby="offcanvasRightLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasRightLabel">Group Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                {% for i in group.gcmembers %}
+                <label class="zlabel" for="a{{ i.id }}">
+                    <div style="height: 50px; width: 100%;" class="d-flex">
+                        <div class="zpfcircle"
+                            style="width: 40px; height: 40px; border: #222831 1px solid; outline: none;">
+                            <img src="{% static i.pfp %}" class="zpfimg" alt="">
+                        </div>
+                        <p class="pt-1 ps-3">{{ i.nickname }}<small style="font-style: italic;">
+                                ({{ i.user.username }}#{{ i.user.id }})</small></p>
+                        <div class="flex-grow-1 d-flex flex-row-reverse">
+                            {% if i == group.creator %}
+                            <p style="border: #ffff00 2px solid; border-radius: 15px; padding: 0 9px 0;">Creator</p>
+                            {% elif i in group.gcadmins %}
+                            <p style="border: #00adb5 2px solid; border-radius: 15px; padding: 0 9px 0;">Admin</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </label>
+                <input id="a{{ i.id }}" class="zrad" type="radio" name="menu" />
+                <ul class="zsubmenu">
+                    <li class="zli">
+                        <a class="zalink" href="{% url 'userdetail' pk=i.id %}">
+                            <div class="zalink text-info">View Profile</div>
+                        </a>
+                    </li>
+                    {% if i != player and player in group.gcadmins and i != group.creator %}
+                    <li class="zli">
+                        <a class="zalink" href="{% url 'group_admin' id=group.id uid=i.id %}">
+                            <div class="zalink">{% if i in group.gcadmins %}<span class="text-warning">Demote
+                                    {{ i.nickname }}</span>{% else %} <span class="text-info">Promote
+                                    {{ i.nickname }}</span> {% endif %}</div>
+                        </a>
+                    </li>
+                    <li class="zli">
+                        <a class="zalink" href="{% url 'group_remove' id=group.id uid=i.id %}">
+                            <div class="zalink text-danger">Kick {{ i.nickname }}</div>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                {% endfor %}
+
+                {% if player != group.creator %}
+                <hr>
+                <a href="" class="zalink" data-bs-toggle="modal" data-bs-target="#leavemodal">
+                    <div style="height: 50px; width: 100%;" class="d-flex">
+                        <div style="width: 40px; height: 40px;">
+                            <p class="zpfimg text-danger"><i class="fa-solid fa-right-from-bracket fa-2x"></i></p>
+                        </div>
+                        <p class="pt-1 ps-3 text-danger">Leave Group</p>
+                    </div>
+                </a>
+                {% endif %}
+                {% if player in group.gcadmins  %}
+                <hr>
+                <a href="" class="zalink" data-bs-toggle="modal" data-bs-target="#addmodal">
+                    <div style="height: 50px; width: 100%;" class="d-flex">
+                        <div style="width: 40px; height: 40px;">
+                            <p class="zpfimg"><i class="fa-solid fa-user-plus fa-2x"></i></p>
+                        </div>
+                        <p class="pt-1 ps-3">Add New Member</p>
+                    </div>
+                </a>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+    <!-- add member modal -->
+    <div class="modal fade" id="addmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content zbg1">
+                <div class="modal-body">
+                    <h5 class="text-white">Select A User to Add</h5>
+                    <hr>
+                    <select name="" id="sel" class="zinvut w-100">
+                        <option value="" class="zbg1"></option>
+                        {% for i in followed %}
+                        {% if i not in group.gcmembers %}
+                        <option class="zbg1" value="{{i.id}},{{i.nickname}},{{i.user.username}},{{i.user.id}},{{i.pfp}},{{i.bio}},{{i.followercount}}">
+                            
+                            <div class="zpfcircle"
+                            style="width: 40px; height: 40px; border: #222831 1px solid; outline: none;">
+                            <img src="{% static i.pfp %}" class="zpfimg" alt="">
+                        </div>{{i.nickname}} ( {{i.user.username}}#{{i.user.id}})
+                        </option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+
+                    <div class="d-flex w-100">
+                        <span id="seluser" ></span>
+                    </div>
+
+                    <hr>
+                    <a id="addbtn"><input class="btn btn-dark disabled" disabled type="button" value="Add Member"></a>
+                    <a data-bs-dismiss="modal"><input class="btn btn-secondary" type="button" value="Cancel"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        sel.onchange = evt => {
+            var link = document.getElementById("addbtn");
+            sr = document.getElementById('sel').value;
+            if (sr){
+                const li = sr.split(',');
+                link.setAttribute("href", "add/" + li[0]);
+                link.innerHTML=`<input class="btn btn-info" type="button" value="Add Member">`
+                document.getElementById("seluser").innerHTML=`
+                            <div style="height: 50px; width: 100%;" class="d-flex">
+                                <div class="zpfcircle"
+                                    style="width: 40px; height: 40px; border: #222831 1px solid; outline: none;">
+                                    <img src="/static/${li[4]}" class="zpfimg" alt="">
+                                </div>
+                                <p class="pt-1 ps-3 text-white">${li[1]}<small style="font-style: italic;">
+                                        (${li[2]}#${li[3]})</small></p>
+                            </div>
+                                <div class="text-white">
+                                    <small>${li[6]} Followers</small>
+                                    <p>${li[5]}</p>
+                                </div>`
+            }else{
+                link.innerHTML=`<input class="btn btn-dark disabled" disabled type="button" value="Add Member">`
+                link.setAttribute("href", "#");
+                document.getElementById("seluser").innerHTML=``
+            }
+        }
+    </script>
+
+    <!-- leave modal -->
+    <div class="modal fade" id="leavemodal" tabindex="-1" aria-labelledby="lexampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content zbg1">
+                {% if group.membercount != 1 and player == group.creator %}
+                <div class="modal-body">
+                    <h5 class="text-warning">Warning</h5>
+                    <hr>
+                    <p class="text-warning">All Group Members must br removed before deleting the group</p>
+                    <a data-bs-dismiss="modal"><input class="btn btn-secondary" type="button" value="Ok"></a>
+                </div>
+                {% else %}
+                <div class="modal-body">
+                    <h5 class="text-danger">Are you Sure?</h5>
+                    <hr>
+                    <a href="{% url 'group_leave' id=group.id %}"><input class="btn btn-danger" type="button"
+                            value="{% if player == group.creator %}Delete Group!{% else %}Leave{% endif %}"></a>
+                    <a data-bs-dismiss="modal"><input class="btn btn-secondary" type="button" value="Cancel"></a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!--gc Modal -->
+    <div class="modal fade" id="gcModal" tabindex="-1" aria-labelledby="gcModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen w-100">
+            <div class="modal-content zbg1 text-white overflow-scroll">
+                <div class="modal-header h-10 p-1">
+                    <h5 class="modal-title" id="gcModalLabel">Group Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="row h-100 p-3">
+
+                    <div class="col-md-6 col-sm-12 b_tes" style="min-height: fit-content;">
+                        
+                        <form method="post" enctype="multipart/form-data" class="h-100 w-100 p-3">
+                            {% csrf_token %}
+                        <div class="y_tes d-flex" style="height: fit-content;">
+                            <div class="g_tes" style="width: 150px;height: 150px;" >
+                                <label for="gcicon"><div class="zpfcircle" style="width: 150px; height: 150px; border: #96a0b3 groove 5px;outline: #464c56 groove 5px;">
+                                <img src="{% static group.icon %}" class="zpfimg" alt=""></div></label>
+                                <input type="file" style="width: 0%; position: absolute" name="icon" disabled id="gcicon" accept="image/*" />
+                            </div>
+                            <div class="r_tes flex-grow-1" >
+                                
+                                <div class="d-flex align-items-center ps-3" style="min-height: 150px; height: fit-content;">
+                                    <div class="b_tes flex-grow-1">
+                                        <div class="d-flex">
+                                            {% if player in group.gcadmins  %}
+                                            <a href="#" id="btedit">
+                                                <i class="fa-solid fa-pen-to-square zhov-white"></i>
+                                            </a>
+                                            {% endif %}
+                                            <label for="zgcpost" id="btsave" style="display: none;">
+                                                <i class="fa-solid fa-floppy-disk zhov-white"></i>
+                                            </label>
+                                            <input type="submit" id="zgcpost" class="d-none">
+
+                                            &nbsp;
+                                            <span id="namespan" class="w-100"><h5 class="w-100 zcontain">{{group.name}}</h5></span>
+                                        </div>
+                                        <p>{{group.membercount}} Members</p>  
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div><hr>
+                        <div class="text-center flex-grow-1">
+                            <p>Group created by {{group.creator}} on {{group.created_date}}</p>  
+                            <span id="descspan"><p class="w-100 text-center">{{group.desc}}</p></span>
+                        </div>
+                        <hr>
+                        <div class=" d-flex justify-content-around">
+                            {% if player in group.gcadmins %}
+                            <a href="#" id="zupdate" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#addmodal">Add Members</a>
+                            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                            {% endif %}
+
+                            <a href="#" class="btn btn-danger" data-bs-toggle="modal"data-bs-target="#leavemodal">
+                                {% if player == group.creator %}Delete Group!
+                                {% else %}
+                                Leave Group
+                                {% endif %}</a>
+
+                        </div>
+                        </form>
+
+                        <script>
+                            const gcname=document.getElementById('namespan');
+                            const gcdesc=document.getElementById('descspan');
+                            const gcicon=document.getElementById('gcicon');
+                            const btedit=document.getElementById('btedit');
+                            const btsave=document.getElementById('btsave');
+                            
+                            btedit.addEventListener('click', () => {
+                                gcdesc.innerHTML=`<textarea id='descarea' maxlength="399" class="zinvut w-100 text-center" style="scrollbar-width: none; resize: none; height: 20px;" required name="desc">{{group.desc}}</textarea>`
+                                gcname.innerHTML=`<input class="zinvut w-100" maxlength="50" style="font-size: 1.25rem;  font-weight: bold;" type="text" name="name" id="zgcname" required value="{{group.name}}">`
+                                btedit.style.display='none'
+                                btsave.style.display='inline'
+                                gcicon.disabled = !gcicon.disabled 
+                                    const descarea=document.getElementById('descarea');
+                                    descarea.style.height = 'auto';
+                                    descarea.style.height = (descarea.scrollHeight + 2) + 'px';
+                                    descarea.addEventListener('input', function() {
+                                        this.style.height = 'auto';
+                                        this.style.height = (this.scrollHeight + 2) + 'px';
+                                    });
+                            });
+
+
+                        </script>
+
+
+                    </div>
+
+                    <div class="h-100 col-md-6 col-sm-12 r_tes p-1" style="min-height: 100%;">
+                        <div class="overflow-scroll b_tes h-100 p-3 rounded-1" style="background-color: #303339;">
+                            {% for i in group.gcmembers %}
+                            <div style="height: 50px; width: 100%;" class="d-flex">
+                                <div>
+                                    <div class="zpfcircle"
+                                        style="width: 40px; height: 40px; border: #222831 1px solid; outline: none;">
+                                        <img src="{% static i.pfp %}" class="zpfimg" alt="">
+                                    </div>
+                                </div>
+                                <p class="pt-1 ps-3">{{ i.nickname }}<small style="font-style: italic;">
+                                        ({{ i.user.username }}#{{ i.user.id }})</small></p>
+                                <div class="flex-grow-1 d-flex flex-row-reverse">
+                                    {% if i == group.creator %}
+                                    <p style="border: #ffff00 2px solid; border-radius: 15px; padding: 0 9px 0;">
+                                        Creator+
+                                    </p>
+                                    {% elif i in group.gcadmins %}
+                                    <p style="border: #00adb5 2px solid; border-radius: 15px; padding: 0 9px 0;">Admin
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+    
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div style="height: 140px"></div>
+    {% load static %}
+
+    <div id="tb" class="text-white row m-0 w-100">
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script type="text/javascript">
+        var refresh = function() {
+            $.ajax({
+                url: '{% url "ajgroup" group.id %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var divbox = $('#tb');
+                    divbox.empty();
+                    var userp = data.userp;
+                    var ajmessages = data.msg;
+                    var buildMessageHTML = function(i) {
+                        if (i.msgtype == 'message'){
+                            var alignment = (userp === i.writer__id) ? 'zchatright' : 'zchatleft';
+                            var nicknameAlignment = (userp === i.writer__id) ? 'text-end zchr' :
+                                'text-start zchl';
+                            var padding = (userp === i.writer__id) ? 'pe-2' : 'ps-2';
+                            var deleteLink = (userp === i.writer__id) ?
+                                '<a style="float: left; color: #1a484a" href="/home/group/' + data.gc +
+                                '/delete/' + i.id +
+                                '"><i class="fa-solid fa-trash zhov-white"></i></a>' :
+                                '';
+                            var imageTag = i.image ?
+                                '<img ondblclick="openimg('+ i.id +')" src="/static/' + i.image +
+                                '" style="height: 200px; width: auto; padding:5px;" alt="err" />' :
+                                '';
+                            return '<div class="' + padding +
+                                '" style="border: transparent 5px solid;">' +
+                                '<div class="zchatbox zcontain ' + alignment + '">' +
+                                '<div class="zchathead ' + nicknameAlignment + '">' + i.writer__nickname + deleteLink + '</div>' +
+                                imageTag +
+                                '<div style="padding: 10px">' + i.text + '</div>' +
+                                '</div></div>';
+                        };
+                        if (i.msgtype == 'left'){
+                            return '<div class="row m-1"><div class="zgcred">'+ i.writer__nickname+' left The Group</div></div>'
+                        };
+                        if (i.msgtype == 'created'){
+                            return '<div class="row m-1"><div class="zgcinfo">'+ i.writer__nickname+' Created The group {{group.name}}</div></div>'
+                        };
+                        if (i.msgtype == 'added'){
+                            return '<div class="row m-1"><div class="zgcinfo">'+ i.writer__nickname+' Joined The group </div></div>'
+                        };
+                        if (i.msgtype == 'kicked'){
+                            return '<div class="row m-1"><div class="zgcred">'+ i.writer__nickname+' Was Removed by Admin </div></div>'
+                        };
+                        
+                    };
+                    var messageHTML = ajmessages.map(buildMessageHTML).join('');
+                    divbox.append(messageHTML);
+                }
+            });
+        };
+        setInterval(refresh, 2000);
+        
+
+        function openimg(id){
+            window.location.href = "/home/open/g/"+parseInt(id)+"/";
+        }
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#chatform').on('submit', function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                zatch = document.getElementById('zatch')
+                zconatch = document.getElementById('zconatch')
+                $.ajax({
+                    url: '{% url "ajgroup" group.id %}', 
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }, 
+                    success: function(response) {
+                        $('#chatform')[0].reset(); 
+                        zatch.style.display='none'; 
+                        zconatch.style.height='40px'; 
+                        refresh()
+                        setTimeout(zscroll, 500)
+                    }
+                });
+            });
+        });
+        var zscroll = function() {
+            window.scrollBy(0, 200)
+        }
+    </script>
+
+    <div style="height: 45px"></div>
+
+    <input type="button" style="width: 0px; height: 0px; position: absolute; margin-left: -50px" id="zend" autofocus />
+    <div id="zconatch" style="
+        z-index: 3;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 40px;
+        color: white;
+      ">
+      <div id="zatch" style="height: 40px; padding: 5px 10px " class="zbg1 zbg0 mx-auto w-50 border border-dark border-bottom-0 rounded-top-3 align-items-center" >
+        <img src="" alt="" width="30px" height="30px" class="rounded-1" id="zprev">&emsp;<i class="fa-solid fa-link"></i><i>attachment</i>
+        <a href="#" onclick="remattch()" style="margin-left: auto; text-decoration: none;" class="zhov-red"><i class="fa-solid fa-xmark fa-1.5x"></i></a>
+      </div>
+        <form autocomplete="off" id="chatform" method="post" class="zbg1 text-white text-center p-1" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" onchange="attch()" style="width: 0%; position: absolute" name="image" id="zing" accept="image/*" />
+            <label for="zing" style="color: #00adb5">
+                <i class="fa-solid fa-images zhov-white p-1"></i>
+            </label>
+            <input type="text" placeholder="say something" name="text" style="
+            padding-left: 5px;
+            width: 70%;
+            color: white;
+            background-color: #464c56;
+            border-radius: 5px;
+            border: 1px solid #00adb5;
+          " maxlength="300" required />
+            <button type="submit" class="btn btn-info p-1" style="height: 25px; width: 50px; border-radius: 10px">
+                <i class="fa-solid fa-paper-plane text-center" style="padding: 2px"></i>
+            </button><p style="height: 200px;"></p>
+            <script>
+                zing=document.getElementById('zing')
+                zatch=document.getElementById('zatch')
+                zconatch=document.getElementById('zconatch')
+                zatch.style.display='none'
+                function attch() {
+                    const [file] = zing.files
+                    if (file) {
+                        zatch.style.display='flex'
+                        zconatch.style.height='80px'
+                        zprev.src = URL.createObjectURL(file)
+                    }else{
+                        zatch.style.display='none'
+                        zconatch.style.height='40px'
+                        zprev.src = ''
+                    }
+                }
+                function remattch(){
+
+                        event.preventDefault(); 
+                        zatch.style.display='none'
+                        zconatch.style.height='40px'
+                        zprev.src = ''
+                        document.getElementById('zing').value = '';
+                }
+            </script>
+        </form>
+        <a class="btn btn-info p-1" href="#zend"
+            style="height: 30px; width: 30px; border-radius: 100%;float: inline-end;margin-top: -285px;">
+            <i class="fa-solid fa-angles-down text-center" style="padding: 2px"></i>
+        </a>
+    </div>
+</body>
+
+</html>

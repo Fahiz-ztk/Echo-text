@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Alert Box</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="../statics/css/theme.css">
+    <script src="../statics/js/script.js"></script>
+
+    <!-- <style>
+        @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css");
+
+        /* Animation */
+        .slit-in-vertical {
+            -webkit-animation: slit-in-vertical 0.45s ease-out both;
+            animation: slit-in-vertical 0.45s ease-out both;
+        }
+
+        @-webkit-keyframes slit-in-vertical {
+            0% {
+                -webkit-transform: translateZ(-800px) rotateY(90deg);
+                transform: translateZ(-800px) rotateY(90deg);
+                opacity: 0;
+            }
+            54% {
+                -webkit-transform: translateZ(-160px) rotateY(87deg);
+                transform: translateZ(-160px) rotateY(87deg);
+                opacity: 1;
+            }
+            100% {
+                -webkit-transform: translateZ(0) rotateY(0);
+                transform: translateZ(0) rotateY(0);
+            }
+        }
+        @keyframes slit-in-vertical {
+            0% {
+                -webkit-transform: translateZ(-800px) rotateY(90deg);
+                transform: translateZ(-800px) rotateY(90deg);
+                opacity: 0;
+            }
+            54% {
+                -webkit-transform: translateZ(-160px) rotateY(87deg);
+                transform: translateZ(-160px) rotateY(87deg);
+                opacity: 1;
+            }
+            100% {
+                -webkit-transform: translateZ(0) rotateY(0);
+                transform: translateZ(0) rotateY(0);
+            }
+        }
+
+        /* Dialog styles */
+        #maindialog{
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            justify-content: center; /* Aligns horizontally */
+            align-items: center;     /* Aligns vertically */
+        }
+        #dialogoverlay {
+            display: none;
+            opacity: .8;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #707070;
+            width: 100%;
+            height: 100%; /* Ensure the overlay covers the full viewport */
+            z-index: 10;
+        }
+
+        #dialogbox {
+            display: none;
+            position: fixed;
+            background: rgb(0, 47, 43);
+            border-radius: 7px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.575);
+            transition: 0.3s;
+            width: 40%;
+            max-width: 500px; /* Optional: sets a maximum width */
+            z-index: 11;
+            transform: translate(-50%, -50%); /* Adjust for exact centering */
+        }
+
+        #dialogbox:hover {
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.911);
+        }
+
+        #dialogbox > div {
+            background: #FFF;
+            margin: 8px;
+        }
+
+        #dialogbox > div > #dialogboxhead {
+            background: rgb(0, 77, 70);
+            font-size: 19px;
+            padding: 10px;
+            color: rgb(255, 255, 255);
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        #dialogbox > div > #dialogboxbody {
+            background: rgb(0, 47, 43);
+            padding: 20px;
+            color: #FFF;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        #dialogbox > div > #dialogboxfoot {
+            background: rgb(0, 47, 43);
+            padding: 10px;
+            text-align: right;
+        }
+
+        .pure-material-button-contained {
+            border: none;
+            border-radius: 4px;
+            padding: 0 16px;
+            height: 36px;
+            text-align: center;
+            text-transform: uppercase;
+            color: #FFF;
+            background-color: rgb(0, 77, 70);
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            font-family: "Roboto", "Segoe UI", BlinkMacSystemFont, system-ui, -apple-system;
+            font-size: 14px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+            
+        }
+
+        .pure-material-button-contained:hover {
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+        }
+    </style>
+    <script>
+        function CustomAlert() {
+            this.alert = function(message, title, url) {
+                if (!document.getElementById('dialogoverlay')) {
+                    document.body.innerHTML += `
+                        <div id="maindialog" class='ju'>
+                            <div id="dialogoverlay"></div>
+                            <div id="dialogbox" class="slit-in-vertical">
+                                <div>
+                                    <div id="dialogboxhead"></div>
+                                    <div id="dialogboxbody"></div>
+                                    <div id="dialogboxfoot"></div>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+
+                let dialogoverlay = document.getElementById('dialogoverlay');
+                let dialogbox = document.getElementById('dialogbox');
+                let maindialog = document.getElementById('maindialog');
+                
+                dialogoverlay.style.height = window.innerHeight + "px";
+                
+                dialogoverlay.style.display = "block";
+                dialogbox.style.display = "block";
+                maindialog.style.display = "flex";
+                
+                let dialogboxhead = document.getElementById('dialogboxhead');
+                let dialogboxbody = document.getElementById('dialogboxbody');
+                let dialogboxfoot = document.getElementById('dialogboxfoot');
+                
+                if (typeof title === 'undefined') {
+                    dialogboxhead.style.display = 'none';
+                } else {
+                    dialogboxhead.innerHTML = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i> ' + title;
+                }
+                dialogboxbody.innerHTML = message;
+                dialogboxfoot.innerHTML = `
+                    <button class="pure-material-button-contained" onclick="customAlert.ok('${url}')">OK</button>
+                    <button class="pure-material-button-contained" onclick="customAlert.cancel()">Cancel</button>`;
+            };
+            
+            this.ok = function(url) {
+                document.getElementById('maindialog').style.display = "none";
+                document.getElementById('dialogbox').style.display = "none";
+                document.getElementById('dialogoverlay').style.display = "none";
+                window.location.href = url; // Navigate to the provided URL
+            };
+            
+            this.cancel = function() {
+                document.getElementById('maindialog').style.display = "none";
+                document.getElementById('dialogbox').style.display = "none";
+                document.getElementById('dialogoverlay').style.display = "none";
+            };
+        }
+
+        let customAlert = new CustomAlert();
+
+        function showAlert(event, url) {
+            event.preventDefault(); // Prevent default link behavior
+            customAlert.alert('Are you sure you want to navigate to this page?', 'Heads Up!', url);
+        }
+    </script> -->
+</head>
+<body>
+    <a class="btn btn-info" onclick="zconfirm(event, 'hi.com')">Show Custom Alert</a><br>
+    <a class="btn btn-info" href="hi.com" onclick="zconirm(event, 'hi.com')">Show Custom Alert</a>
+</body>
+</html>

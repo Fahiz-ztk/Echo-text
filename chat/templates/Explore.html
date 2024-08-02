@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore</title>
+</head>
+
+<body>
+    {% extends "Home.html" %}
+    {%block body%}
+
+    {% load static %}
+    {% csrf_token %}
+
+
+
+
+    <ul class="ztabs">
+<!-- zzexplore -->
+        <li class="ztab">
+            <input type="radio" onchange="tabselect('posts')" name="ztabs" {%if not tab %} checked="checked" {% endif %} id="ztab1" />
+            <div id="ztab-content1" class="content">
+                <div class="d-flex centered w-100 text-end zbg1">
+                    <div class="mx-auto w-100 p-1">
+                        <button class="zinvut p-1 m-1 h-50" onclick="toggleSlider()"><i class=" zhov-white fa-solid fa-table-cells"></i></button>
+                        <div class="zslider-container" id="zsliderContainer" style="position: fixed;">
+                            <input type="range" class="zslider m-3" id="postcardsize" min="1" max="10" step="1" oninput="setpostsize()"><br>
+                            <label for="autoslider">Auto </label><input type="checkbox" id="autoslider">
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+
+
+                    function toggleSlider() {
+                        const sliderContainer = document.getElementById('zsliderContainer');
+                        if (sliderContainer.style.display === 'none' || sliderContainer.style.display === '') {
+                            sliderContainer.style.display = 'block';
+                            document.addEventListener('click', outsideClickListener);
+                        } else {
+                            sliderContainer.style.display = 'none';
+                            document.removeEventListener('click', outsideClickListener);
+                        }
+                    }
+
+                    function outsideClickListener(event) {
+                        const sliderContainer = document.getElementById('zsliderContainer');
+                        if (!sliderContainer.contains(event.target) && !event.target.closest('button.zinvut')) {
+                            sliderContainer.style.display = 'none';
+                            document.removeEventListener('click', outsideClickListener);
+                        }
+                    }
+
+
+
+                    document.addEventListener('DOMContentLoaded', (event) => {
+                        var postsize = localStorage.getItem('postcardsize') || Math.floor(window.innerWidth / 150);
+                        const postcardsizeSlider = document.getElementById('postcardsize');
+                        postcardsizeSlider.value = postsize;
+                        setpostsize();
+
+                        window.onresize = function() {
+                            const autosliderCheckbox = document.getElementById('autoslider');
+                            if (autosliderCheckbox && autosliderCheckbox.checked) {
+                                postsize = Math.floor(window.innerWidth / 150);
+                                localStorage.setItem('postcardsize', postsize);
+                                updatePostSize(postsize);
+                            }
+                        };
+                    });
+
+
+
+                    function setpostsize() {
+                        const autosliderCheckbox = document.getElementById('autoslider');
+                        if (!autosliderCheckbox.checked) {
+                            var postsize = document.getElementById('postcardsize').value;
+                            localStorage.setItem('postcardsize', postsize);
+                            updatePostSize(postsize);
+                        }
+                    }
+
+                    function updatePostSize(postsize) {
+                        const postcards = document.getElementsByClassName('zpostcard');
+                        var size = 100 / postsize + 'vw';
+                        for (let i = 0; i < postcards.length; i++) {
+                            postcards[i].style.width = size;
+                            postcards[i].style.height = size;
+                        }
+                    }
+                </script>
+
+                {% for i in post %}
+                <a href="{%url 'postdetail' i.id%}">
+                    <span data-bs-toggle="modal" data-bs-target="#exampleModal2">
+                        <div class="zpostcard card" id="postcard" style="width: 20vw; height: 20vw; margin: 0px;">
+                            <img src="{% static i.thumb %}" class="card-img-top"
+                                style="width: 100%; height: 100%; border-radius: 0px;" alt="NO">
+                            <div class="card-body zpop"
+                                style="position: absolute; overflow: hidden; width: 100%; height: 100%;">
+                                <div class="d-flex flex-column justify-content-between h-100">
+                                    <div class="">
+                                        <p class="card-text">{{i.title}}</p>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <p class="card-text m-0"><span style="white-space: nowrap;">
+                                            <i class="fa-solid fa-heart"></i> {{i.likecount}} 
+                                        </span></p>
+                                        <p class="card-text">{{i.profile}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </span>
+                </a>
+                {% endfor %}
+            </div>
+            
+        </li>
+<!-- zzusers -->
+        <li class="ztab">
+            <input type="radio" onchange="tabselect('users')" name="ztabs" {%if tab == 'users' %} checked="checked" {% endif %} id="ztab2" />
+            <div id="ztab-content2" class="content">
+
+                <div class="d-flex centered w-100 text-center zbg1">
+                    <div class="mx-auto w-100">
+                        {% if tab == 'users' %}
+                        <input type="text" class="border border-0 zbg8 rounded-1 text-white m-1" style="height: 40px; width: 50%;" autofocus id='searchbar'>
+                        {% else %}
+                        <a href="{% url 'explore_tab' 'users' %}"><input type="text" class="border border-0 zbg7 rounded-1 text-white m-1" style="height: 40px; width: 50%;"></a>
+                        {% endif %}
+                        <a href="" id='abc'><button class="btn btn-info m-1 mb-2"><b><i class="fa-solid fa-magnifying-glass"></i></b></button></a>
+                        <a href="{% url 'explore_tab' 'users' %}"><button class="btn btn-secondary m-1 mb-2"><b><i class="fa-solid fa-xmark"></i></b></button></a>
+                    </div>
+                </div>
+                
+
+                <script>
+                    searchbar = document.getElementById('searchbar')
+                    searchbar.onchange  = evt =>  {
+                        var link = document.getElementById("abc");
+                        sr=document.getElementById('searchbar').value;
+                        link.setAttribute("href", sr);
+                    }
+                </script>
+
+                {% for i in people %}
+                <a href="{% url 'userdetail' i.id%}" style="text-decoration: none;">
+                    <div class="card mt-1 zbg7 text-white p-3" style="width: 100%; height: 220px;">
+                        <div class="row g-0">
+                            <div class="col-12" style="text-align: left;">
+                                <div style="
+                          overflow: hidden;
+                          height: 190px;
+                          width: 190px;
+                          border-radius: 100px;margin-left: 0;
+                          border: 8px #5c5c5c groove;
+                          float: left;
+                        ">
+                                    <img style="width: 100%; min-height: 100%; height: auto" src="{% static i.pfp %}"
+                                        alt="" />
+                                </div>
+                                <div class="card-body" style="margin-left: 10%;">
+                                    <h4 class="d-inline card-title ms-3"><b>{{i.nickname}}</b></h4><small style="color: #999;"> &emsp;{{i.user}}#{{i.user.id}}</small>
+                                    <h6 class="card-title ms-5" style="color: #a9a9a9;">{{i.followercount}} followers</h6>
+                                    <p class="card-text ms-5 mt-4" style="color: #9a9a9a;"><i>{{i.bio}}</i></p>
+                                    <p class="card-text ms-5 mt-4"><small style="color: #a9a9a9;">Joined on {{ i.user.date_joined|date:"d/m/Y" }}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+
+
+            </div>
+        </li>
+<!-- zzchats -->
+        <li class="ztab">
+            <input type="radio"  onchange="tabselect('chats')" name="ztabs" {%if tab == 'chats' %} checked="checked" {% endif %} id="ztab3" />
+            <div id="ztab-content3" class="content">
+                
+                
+                {% for i in outgos %}
+                <a href="{% url 'chat' i.id%}" style="text-decoration: none;">
+                    <div class="card mt-1 zbg7 text-white p-1" style="width: 100%; height: 110px;">
+                        <div class="row g-0">
+                            <div class="col-12" style="text-align: left;">
+                                <div style="
+                          overflow: hidden;
+                          height: 100px;
+                          width: 100px;
+                          border-radius: 100px;
+                          border: 3px #5c5c5c groove;
+                          float: left;
+                        ">
+                                    <img style="width: 100%; min-height: 100%; height: auto" src="{% static i.pfp %}"
+                                        alt="" />
+                                </div>
+                                <div class="card-body" style="margin-left: 50px;">
+                                    <h5 class="card-title ms-5" style="margin-top: -10px;"><b>{{i.nickname}}</b></h5>
+                                    <p class="card-text ms-5 mt-4" >
+                                    {% for j in lst %}
+                                        {% if  j.writer == profile and j.reader == i %}
+                                            You : {{j.text}} </p> <i style="margin-top: -20px;float: left; color: #a7a7a7;" class="ms-3">{{j.date}} {{j.time}}</i>
+                                        {% comment %} {% elif  j.reader == profile and j.writer == i %}
+                                            {{i.nickname}} : {{j.text}} {% endcomment %}
+                                        {% endif %}
+                                    {% endfor %}
+
+
+
+                                    
+                                    <p class="card-text ms-5 zwdhide"><small style="color: #a9a9a9; float: inline-end; margin-top: -20px;">Last Login at {{i.user.last_login}}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+                <br>
+                {% if incoms %}    
+                    <h6 style="width: 100%;text-align: center; border-bottom: 3px solid #53637e; color: #7c93ba; line-height: 0.1em; margin: 10px 0 20px;"><span style="background-color: #222831; z-index: 2;">&emsp;Unknown Users&emsp;</span> </h6>
+                {% endif %}
+                {% for i in incoms %}
+                <a href="{% url 'chat' i.id%}" style="text-decoration: none;">
+                    <div class="card mt-1 zbg8 text-white p-1" style="width: 100%; height: 110px;">
+                        <div class="row g-0">
+                            <div class="col-12" style="text-align: left;">
+                                <div style="
+                          overflow: hidden;
+                          height: 100px;
+                          width: 100px;
+                          border-radius: 100px;
+                          border: 3px #5c5c5c groove;
+                          float: left;
+                        ">
+                                    <img style="width: 100%; min-height: 100%; height: auto" src="{% static i.pfp %}"
+                                        alt="" />
+                                </div>
+                                <div class="card-body" style="margin-left: 50px;">
+                                    <h5 class="card-title ms-5" style="margin-top: -10px;"><b>{{i.nickname}}</b></h5>
+                                    <p class="card-text ms-5 mt-4" >
+                                        {% for j in lst %}
+                                            {% if  j.reader == profile and j.writer == i %}
+                                                {{i.nickname}} : {{j.text}}</p> <i style="margin-top: -20px;float: left; color: #a7a7a7;" class="ms-3"> {{j.date}} {{j.time}}</i>
+                                            {% endif %}
+                                        {% endfor %}
+                                 
+                                    <p class="card-text ms-5 zwdhide"><small style="color: #a9a9a9; float: inline-end; margin-top: -20px;">Last Login at {{i.user.last_login}}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+
+
+            </div>
+        </li>
+<!-- zzgroups -->
+        <li class="ztab">
+            <input type="radio" onchange="tabselect('groups')" name="ztabs" {%if tab == 'groups' %} checked="checked" {% endif %} id="ztab4" />
+            <div id="ztab-content4" class="content">
+
+                <div class="d-flex centered w-100 text-end zbg1">
+                    <div class="mx-auto w-100">
+                        <a href="{% url 'explore_tab' 'users' %}"  data-bs-toggle="modal" data-bs-target="#groupModal"><button class="btn btn-info m-1 mb-2"><b><i class="fa-solid fa-user-group">+</i></b></button></a>
+                    </div>
+                </div>
+
+                {% for i in groups %}
+                <a href="{% url 'group' i.id%}" style="text-decoration: none;">
+                    <div class="card mt-1 zbg7 text-white p-1" style="width: 100%; height: 110px;">
+                        <div class="row g-0">
+                            <div class="col-12" style="text-align: left;">
+                                <div style="
+                          overflow: hidden;
+                          height: 100px;
+                          width: 100px;
+                          border-radius: 100px;
+                          border: 3px #5c5c5c groove;
+                          float: left;
+                        ">
+                                    <img style="width: 100%; min-height: 100%; height: auto" src="{% static i.icon %}"
+                                        alt="" />
+                                </div>
+                                <div class="card-body" style="margin-left: 50px;">
+                                    <h5 class="card-title ms-5" style="margin-top: -10px;"><b>{{i.name}}</b></h5>
+                                    <p class="card-text ms-5 mt-4" >
+                                        {{i.last.writer}} {% if i.last.msgtype == 'message' %}:{% endif %} {% if i.last.image %} <i class="fa-regular fa-image"></i>{% endif %} {{i.last}}
+                                    </p>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}            
+            </div>
+
+        </li>
+
+    </ul>
+
+
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#exampleModal2').on('hidden.bs.modal', function () {
+                window.location.href = "{% url 'explore' %}";
+            });
+        });
+    </script>
+
+
+    <!-- Modal post details -->
+    <div class="modal mpd fade modal-xl" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog-centered modal-dialog" style="width: fit-content; ">
+            <div class="modal-content zbg1t zdivndiv" style="width: fit-content;">
+                <div class="modal-body row" id="togglemain" style="width: 550px;">
+                    {% if postdetail.id %}
+                    <div class="w-100">
+                        <button type="button" class="btn-close" onclick="explore()" data-bs-dismiss="modal" style="float: right;" aria-label="Close"></button>
+                    </div>
+                    
+                    <div class="col">
+                        <h4 class="text-white">{{postdetail.title}}</h4>
+                        <div style="width: 100%; overflow: scroll; max-height: 450px;">
+                            <img src="{% static postdetail.image %}" ondblclick="openimg()" id="mainimg" style="width: 500px; height: auto" alt="">
+                        </div>
+                        <div>
+                            <div class="mt-2">
+                                <div class="row  text-center">
+                                    <div class="col"><a class=" zhov-white" href="{% url 'like' postdetail.id%}">{{postdetail.likecount}} 
+                                    {% if liked %}
+                                        <i class="fa-solid fa-heart"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-heart"></i>
+                                    {% endif %}
+                                    </a></div>
+                                    <div class="col"><a id="cmttoggle" class=" zhov-white" href="#">{{postdetail.cmtcount}} <i class="fa-regular fa-message"></i></a></div>
+                                </div>
+                                <div class="d-flex text-white">
+                                    <div class="zpfcircle" style="height: 25px; width: 25px; border: 1px #7d8696 outset; outline: none;">
+                                        <img src="{% static postdetail.profile.pfp %}" class="zpfimg" alt="">
+                                    </div>&nbsp;<b>{{postdetail.profile}}</b>
+                                </div>
+                                <p class="text-white">{{postdetail.text}}&nbsp<small class="text-secondary">{{ postdetail.date|date:"d-m-Y" }}&nbsp;{{ postdetail.time }}</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cmtdiv" style="display: none;" class="col-lg-6 col-md-12 pt-4 p-1">
+                        <div class="w-100 h-100 zbg1t rounded-3 p-3">
+                            <div class="p-3 text-white w-100" style="height: 500px; overflow-y: scroll; overflow-x: hidden;">
+                                {% for i in comments %}
+                                <div class="row mt-1">
+                                        <div class="col-1">
+                                            <div class="zpfcircle" style="margin-left: -8px; height: 30px; width: 30px; border: 1px solid #000; outline: none;">
+                                                <img src="{% static i.user.pfp %}" class="zpfimg" alt="">
+                                            </div>
+                                        </div>
+                                            <div class="col-11">
+                                                <a href="{% url 'likecmt' id=postdetail.id cmt=i.id %}" style="text-decoration: none;">
+                                                    <div class=" zbg6 rounded-1 text-white p-1 ps-3 zcontain">
+                                                        <p class="fw-bold">{{i.user}}<small class="text-secondary" style="float:inline-end;">{{i.datetime}}</small></p>
+                                                        <p>{{i.text}}</p>
+                                                    </div>
+                                                </a>
+                                                {% if i.likecount > 0 %}
+                                                <div class="rounded-5 zbg3 ps-2 pe-2" style="width: fit-content; font-size: x-small;"> <i class="fa-regular fa-heart"></i> {{i.likecount}}</div>
+                                                {% endif %}
+                                            </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="p-1">
+                                <form method="post"  autocomplete="off" class="d-flex pt-3">
+                                    {% csrf_token %}
+                                    <input type="text" class="zinvut" style=" width: 90%; background-color: #222831; border-radius: 5px;" name="text" required>
+                                    <button type="submit" class="btn btn-info" style="height: 30px;" ><i class="fa-solid fa-chevron-up"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        const myDiv = document.getElementById('cmtdiv');
+                        const maindiv = document.getElementById('togglemain');
+                        mblrcz()
+                        
+                        function mblrcz(){
+                            if (window.innerWidth<600){
+                                    document.getElementById('mainimg').style.width=(window.innerWidth-80)+'px'
+                                    maindiv.style.width=window.innerWidth+'px'
+                                }
+                            else{
+                                    document.getElementById('mainimg').style.width='500px'
+                            }
+                        }
+                        
+                        document.getElementById('cmttoggle').addEventListener('click', function() {
+                            if (myDiv.style.display === 'none') {
+                                myDiv.style.display = 'block';
+                                if (window.innerWidth < 1000) {
+                                    maindiv.style.width = '550px';
+                                } else {
+                                    maindiv.style.width = '1100px';
+                                }
+                            } else {
+                                maindiv.style.width = '550px';
+                                myDiv.style.display = 'none';
+                            }
+                            mblrcz()
+                        });
+                        window.addEventListener('resize', function() {
+                            if (myDiv.style.display == 'block'){
+                                if (window.innerWidth < 1000) {
+                                    maindiv.style.width = '550px';
+                                } else {
+                                    maindiv.style.width = '1100px';
+                                }
+                            }
+                            mblrcz()
+                        });
+
+                        function openimg(){
+                            window.location.href = "{% url 'postopen' 'p' postdetail.id %}";
+                        }
+                        function explore(){
+                            window.location.href = "{% url 'explore' %}";
+                        }
+
+                    </script>
+                    {% endif %}
+
+
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    {%if pk%}
+    <script>
+        var myModal = new bootstrap.Modal(document.getElementById('exampleModal2'), {})
+        myModal.show()
+    </script>
+    {% endif %}
+
+
+
+
+
+    <!-- Modal post upload -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content zbg1 text-white">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Create Post</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form autocomplete="off" method="post" enctype="multipart/form-data" class="p-3">
+
+                    {% csrf_token %}
+                    <input type="text" placeholder="Title" required name='title'
+                        class="border border-0 zbg2 rounded-1 text-white m-1" /><br>
+                    <textarea type="text" placeholder="Body" required name='text' maxlength="600"
+                        class="border border-0 zbg2 rounded-1 text-white m-1"  style=" width: 100%;" ></textarea><br>
+                        <input type="file" accept="image/*" required placeholder="Image" id="imgInp" name='image'
+                        class="border border-0 zbg2 rounded-1 text-white m-1" />
+                    <br>
+                    <div style="width: 465px; height: 465px; overflow: scroll;"><img src="#" id="zprev" alt=""
+                            style="width: 465px; height: auto;"></div>
+                    <br>
+
+
+                    <script>
+                        imgInp.onchange = evt => {
+                            const [file] = imgInp.files
+                            if (file) {
+                                zprev.src = URL.createObjectURL(file)
+                            }
+                        }
+                    </script>
+
+                    <input type="submit" value="Post" class="btn btn-info">
+
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="groupModal" tabindex="-1" aria-labelledby="groupModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content zbg1 text-white">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="groupModalLabel">Create Group</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form autocomplete="off" method="post" enctype="multipart/form-data" class="p-3">
+
+                    {% csrf_token %}
+                    <label class="w-100" for='imgInp2'>
+                        <div class="zpfcircle  mx-auto"><img src="#" id="zprev2" alt=""
+                            class="zpfimg"></div>
+                    </label>
+                    <input type="file" accept="image/*" required placeholder="Image" id="imgInp2" name='icon'
+                    style="display: none;" />
+                    <input type="text" placeholder="Group Name" required name='name'
+                        class="border border-0 zbg2 rounded-1 text-white m-1" /><br>
+                    <textarea type="text" placeholder="Body" required name='desc'
+                        class="border border-0 zbg2 rounded-1 text-white m-1"  style=" width: 100%;" ></textarea> <br>
+                   
+                    
+                    <script>
+                        imgInp2.onchange = evt => {
+                            const [file] = imgInp2.files
+                            if (file) {
+                                zprev2.src = URL.createObjectURL(file)
+                            }
+                        }
+                    </script>
+
+                    <input type="submit" value="Create Group" class="btn btn-info">
+
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <div class="zfooter zbg1 text-center row m-0" style="z-index: 2;">
+       <div class="col-5">
+        <div class="row">
+            <div class="col-6"><label id="posts" class="ztabber ztabbed" id="tbposts" for="ztab1"></i>Posts</label></div>
+            <div class="col-6"><label id="users" class="ztabber" id="tb-users" for="ztab2"></i>People</label></div>
+        </div>
+       </div>
+        <div class="col-2">
+            <label style=" padding: 10px 10px 0; text-align: center;">
+                <a href="#" data-bs-toggle="modal" style="color: aqua;"
+                    data-bs-target="#exampleModal"><i class="fa-solid fa-circle-plus fa-2x zhov-white"></i></a>
+            </label>
+        </div>
+        <div class="col-5">
+            <div class="row">
+                <div class="col-6"><label id="chats" class="ztabber" id="tb-chats" for="ztab3"></i>Chats</label></div>
+                <div class="col-6"><label id="groups" class="ztabber" id="tb-groups" for="ztab4"></i>Groups</label></div>
+            </div>
+        </div>
+    </div>
+ 
+    <script>
+        
+        const tb1 = document.getElementById('posts');
+        const tb2 = document.getElementById('users');
+        const tb3 = document.getElementById('chats');
+        const tb4 = document.getElementById('groups');
+        function tablabel () {
+
+            if (window.innerHeight / window.innerWidth > 1.5) {
+                tb1.innerHTML = '<i class="fa-solid fa-house"></i>';
+                tb2.innerHTML = '<i class="fa-solid fa-users"></i>';
+                tb3.innerHTML = '<i class="fa-solid fa-comment"></i>';
+                tb4.innerHTML = '<i class="fa-solid fa-comments"></i>';
+            } else {
+                tb1.textContent = 'Posts';
+                tb2.textContent = 'People';
+                tb3.textContent = 'Chats';
+                tb4.textContent = 'Groups';
+            }
+        };
+
+        window.addEventListener('resize', tablabel);
+        tablabel();
+    </script>
+
+    <script>
+
+        let tab1 = document.getElementById('posts');
+        let tab2 = document.getElementById('users');
+        let tab3 = document.getElementById('chats');
+        let tab4 = document.getElementById('groups');
+        
+        if ("{{tab}}"=="users" || "{{tab}}"=="groups" || "{{tab}}"=="chats")
+            tabselect("{{tab}}")
+        else
+            tabselect("posts")
+
+        function tabselect(tab) {
+            tab1.classList.remove('ztabbed');
+            tab2.classList.remove('ztabbed');
+            tab3.classList.remove('ztabbed');
+            tab4.classList.remove('ztabbed');
+            document.getElementById(tab).classList.add('ztabbed');
+            console.log(tab);
+        }
+    </script>
+
+    {%endblock body%}
+
+</body>
+
+</html>

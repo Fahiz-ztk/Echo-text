@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+</head>
+
+<body>
+    {% extends "Home_empty.html" %}
+    {%block body%}
+
+    {% load static %}
+
+    <a href="{%url 'explore'%}" style="position: absolute; padding: 20px;" class="zbg3t"><i class="fa-solid fa-chevron-left text-center fa-2x zhov-white"></i></a>
+    {% if form %}
+
+
+    <form action="" method="post" enctype="multipart/form-data" class="">
+        <div class="row text-white p-4 zbg1" >
+            {%csrf_token%}
+            <label for="zimg" style="float: left; width: fit-content;">
+                <div class="" style="width: fit-content;">
+                    <div class="zpfcircle">
+                        <img style="width: 100%; min-height: 100%; height: auto" src="{% static profile.pfp %}" alt="" />
+                        
+                    {%if request.user.id == profile.user.id %}
+                    <a href="{% url 'userupdate' profile.id %}">
+                        <button type="submit" class="btn-info btn"
+                            style="position: absolute; border-radius: 500px;left: 25px;top: 240px; height: 42px;width: 42px;"><i
+                                class="fa-solid  fa-floppy-disk"></i></button>
+                    </a>
+                    {%endif%}
+                    </div>
+                </div>
+            </label>
+            <div class="col-md-4 col-sm-12" style="padding: 30px 10px 0;">
+                <input type="file" id="zimg" accept="image/*" name="pfp" style="width: 0px; position: absolute;">        
+                <h2><input type="text" maxlength="50" name="nickname" class="zinvut zedit" style="width: fit-content;" value="{{profile.nickname}}"> <small class="text-secondary fs-5 text">{{profile.user.username}}#{{profile.user.id}}</small></input></h2>
+                <i><textarea name="bio" maxlength="500" id="bioinp" class="zinvut zedit" style="scrollbar-width: none; width: 100%; height: fit-content; resize: none;">{{profile.bio}}</textarea></i><br><br>
+
+                <script>
+                    // JavaScript to auto-expand textarea
+                    const textarea = document.getElementById('bioinp');
+            
+                    textarea.addEventListener('input', () => {
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 'px';
+                    });
+                </script>
+
+                <select name="status" class="zinvut zedit">
+                    <option value="{{profile.status}}" class="zbg1">{{profile.status}}</option>
+                    <option value="Online" class="zbg1">Online</option>
+                    <option value="Busy" class="zbg1">Busy</option>
+                    <option value="Sleep" class="zbg1">Sleep</option>
+                    <option value="Donot Disturb" class="zbg1">Donot Disturb</option>
+                </select> <br>
+                <p class="text-secondary mt-2">Joined on {{ profile.user.date_joined|date:"d/m/Y" }}</p>
+            </div>
+            <div class="col-md-4 col-sm-12" style="padding: 30px 10px 0;">
+                <div class="row text-center">
+                    <div class="col-4"><h6>Posts</h6><h4>{{profile.postcount}}</h4></div>
+                    <div class="col-4"><h6>Followers</h6><h4>{{profile.followercount}}</h4></div>
+                    <div class="col-4"><h6>Following</h6><h4>{{profile.followingcount}}</h4></div>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    
+    <div class="row text-white p-4 zbg1" >
+        <div class="" style="width: fit-content;">
+            <div class="zpfcircle">
+                <img style="width: 100%; min-height: 100%; height: auto" src="{% static profile.pfp %}" alt="" />
+                
+            {%if request.user.id == profile.user.id %}
+            <a href="{% url 'userupdate' profile.id %}">
+                <button type="button" class="btn-info btn"
+                    style="position: absolute; border-radius: 500px;left: 25px;top: 240px; height: 42px;width: 42px;"><i
+                        class="fa-solid fa-user-pen"></i></button>
+            </a>
+            {%endif%}
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-12" style="padding: 30px 10px 0;">
+            <h2>{{profile.nickname}} <small class="text-secondary fs-5 text">{{profile.user.username}}#{{profile.user.id}}</small></h2>
+            <i class="zcontain">{{profile.bio}}</i><br><br>
+            {{profile.status}} <br>
+            <p class="text-secondary mt-2">Joined on {{ profile.user.date_joined|date:"d/m/Y" }}</p>
+        </div>
+        <div class="col-md-4 col-sm-12" style="padding: 30px 10px 0;">
+            <div class="row text-center">
+                <div class="col-4"><h6>Posts</h6><h4>{{profile.postcount}}</h4></div>
+                <div class="col-4"><h6>Followers</h6><h4>{{profile.followercount}}</h4></div>
+                <div class="col-4"><h6>Following</h6><h4>{{profile.followingcount}}</h4></div>
+            </div>
+            {% if profile.user != request.user  %}
+            <div class="row">
+                &nbsp;
+            </div>
+            <div class="row text-center">     
+                <div class="col-6"><a href="{% url 'chat' profile.id%}"  ><button type="button" class="btn btn-info" style="width: 100%; height: 100%;"><i class="fa-brands fa-rocketchat"></i> <b>Start chat</b></button></a></div>
+                <div class="col-6"><a href="{% url 'follow' profile.id%}"><button type="button" class="btn btn-info" style="width: 100%; height: 100%;">
+                    {%if followed %}
+                    <i class="fa-solid fa-user-minus"></i> <b>Unfollow</b></button></a>
+                    {% else %}
+                    <i class="fa-solid fa-user-plus"></i> <b>Follow</b></button></a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% for i in posted %}
+    <a href="{% url 'userpostdetail'  dtl=i.id pk=profile.id %}">
+        <span data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <div class="zpostcard card" id="postcard" style="width: 20vw; height: 20vw; margin: 0px;">
+                <img src="{% static i.thumb %}" class="card-img-top"
+                    style="width: 100%; height: 100%; border-radius: 0px;" alt="NO">
+                <div class="card-body zpop"
+                    style="position: absolute; overflow: hidden; width: 100%; height: 100%;">
+                    <div class="d-flex-column h-100">
+                        <div class="h-90">
+                            <p class="card-text">{{i.profile}}</p>
+                        </div>
+                        <div class="flex-shrink-1">
+                            <p class="card-text"><i class="fa-solid fa-heart"></i>{{i.likecount}} {{i.title}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </span>
+    </a>
+    {% endfor %}
+<script>
+    updatePostSize(localStorage.getItem('postcardsize') || Math.floor(window.innerWidth / 150))
+    function updatePostSize(postsize) {
+        const postcards = document.getElementsByClassName('zpostcard');
+        var size = 100 / postsize + 'vw';
+        for (let i = 0; i < postcards.length; i++) {
+            postcards[i].style.width = size;
+            postcards[i].style.height = size;
+        }
+    }
+    function mblrcz(){
+        if (window.innerWidth<600){
+                document.getElementById('mainimg').style.width=(window.innerWidth-80)+'px'
+                maindiv.style.width=window.innerWidth+'px'
+            }
+        else{
+                document.getElementById('mainimg').style.width='500px'
+        }
+    }
+</script>
+
+  <!-- Modal post details -->
+  <div class="modal mpd fade modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog-centered modal-dialog" style="width: fit-content; ">
+      <div class="modal-content zbg1t zdivndiv" style="width: fit-content;">
+          <div class="modal-body row" id="togglemain" style="width: 550px;">
+              {% if postdetail.id %}
+              <div class="w-100">
+                <a href="{%url 'userdetail' profile.id %}" style="float: right;"><i class="fa-solid fa-xmark zhov-white fa-2x"></i></a>
+
+              </div>
+              
+              <div class="col">
+                  <h4 class="text-white">{{postdetail.title}}</h4>
+                  <div style="width: 100%; overflow: scroll; max-height: 450px;">
+                      <img src="{% static postdetail.image %}" ondblclick="openimg()" id="mainimg" style="width: 500px; height: auto" alt="">
+                  </div>
+                  <div>
+                      <div class="mt-2">
+                          <div class="d-flex text-white justify-content-between">
+                              <div class="d-flex">
+                                  <div class="zpfcircle" style="height: 25px; width: 25px; border: 1px #7d8696 outset; outline: none;">
+                                      <img src="{% static postdetail.profile.pfp %}" class="zpfimg" alt="">
+                                  </div>&nbsp;<b>{{postdetail.profile}}</b>
+                              </div>
+                              
+                            <div>
+                                {% if dtl and request.user.id == profile.user.id %}
+                                <a href="{% url 'postdelete' pk=profile.id dtl=postdetail.id %}" onclick="zconfirm(event, `{% url 'postdelete' pk=profile.id dtl=postdetail.id %}`,'Delete post','Are you sure want to delete the post <i>{{postdetail.title}}</i> ?')" style="float: right;"><i class=" fa-solid fa-trash zhov-red"></i></a>
+                                {% endif%}
+                            </div>
+                          </div>
+                          <p class="text-white">{{postdetail.text}}&nbsp<small class="text-secondary">{{ postdetail.date|date:"d-m-Y" }}&nbsp;{{ postdetail.time }}</small></p>
+                      </div>
+                  </div>
+              </div>
+              <script>
+                  const myDiv = document.getElementById('cmtdiv');
+                  const maindiv = document.getElementById('togglemain');
+                  mblrcz()
+                  
+                  function mblrcz(){
+                      if (window.innerWidth<600){
+                              document.getElementById('mainimg').style.width=(window.innerWidth-80)+'px'
+                              maindiv.style.width=window.innerWidth+'px'
+                          }
+                      else{
+                              document.getElementById('mainimg').style.width='500px'
+                      }
+                  }
+                  
+                  window.addEventListener('resize', function() {
+                      if (myDiv.style.display == 'block'){
+                          if (window.innerWidth < 1000) {
+                              maindiv.style.width = '550px';
+                          } else {
+                              maindiv.style.width = '1100px';
+                          }
+                      }
+                      mblrcz()
+                  });
+
+                  function openimg(){
+                      window.location.href = "{% url 'postopen' 'p' postdetail.id %}";
+                  }
+
+              </script>
+              {% endif %}
+
+
+          </div>
+          
+      </div>
+  </div>
+</div>
+
+
+  {% if dtl %}
+  <script>
+  var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {})
+  myModal.show()
+  </script>
+  {% endif %}
+
+{%endblock body%}
+
+</body>
+
+</html>

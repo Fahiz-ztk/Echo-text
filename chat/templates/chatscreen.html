@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat with {{opp.nickname}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+  </script>
+  <script src="https://kit.fontawesome.com/b7f5da0622.js" crossorigin="anonymous"></script>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href=" {% static 'chat/statics/css/theme.css' %} " />
+  <style>
+    body {
+      background: #222831 url("/static/chat/statics/wallp/what.png");
+      background-size: 500px;
+    }
+  </style>
+</head>
+
+<body onload="refresh()">
+  <nav class="navbar zbg1 fixed-top" style="height: fit-content">
+    <div class="container-fluid">
+      <div class="navbar-brand text-white">
+        <a href="{% url 'explore_tab' 'chats' %}" style="
+              color: #00adb5;
+              float: left;
+              text-align: center;
+              padding: 15px 10px 15px;
+            "><i class="fa-solid fa-chevron-left text-center fa-2x zhov-white"></i></a>
+        <div style="
+              overflow: hidden;
+              height: 80px;
+              width: 80px;
+              border-radius: 100px;
+              border: 5px #5c5c5c groove;
+              float: left;
+            ">
+          <img style="width: 100%; min-height: 100%; height: auto" src="{% static opp.pfp %}" alt="" />
+        </div>
+        <div style="width: 30px; height: 70px; float: left"></div>
+        <h4 style="padding-top: 8px">{{opp.nickname}}</h4>
+        <p style="font-style: italic; font-size: x-small; color: #939393">
+          {{opp.bio}}
+        </p>
+      </div>
+    </div>
+  </nav>
+
+  <div style="height: 140px"></div>
+  {% load static %}
+
+
+    <table id="tb" class="text-white w-100" >
+          
+  </table>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+  var refresh = function() {
+    $.ajax({
+      url: '{% url "ajchat" opp.id %}', // Ensure this URL pattern is correct
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        var tableBody = $('#tb');
+        tableBody.empty();
+        
+        var userp = data.userp;
+        var messages = data.msg;
+        var buildMessageHTML = function(i) {
+          var alignment = (userp === i.writer__id) ? 'zchatright' : 'zchatleft';
+          var nicknameAlignment = (userp === i.writer__id) ? 'text-end zchr' : 'text-start zchl';
+          var padding = (userp === i.writer__id) ? 'pe-2' : 'ps-2';
+
+          var deleteLink = (userp === i.writer__id) ?
+            '<a style="float: left; color: #1a484a" href="/home/chat/' + data.usero + '/delete/' + i.id + '"><i class="fa-solid fa-trash zhov-white"></i></a>' :
+            '';
+
+          var imageTag = i.image ? 
+            '<img ondblclick="openimg('+ i.id +')" src="/static/' + i.image + '" style="height: 200px; width: auto; padding:5px;" alt="err" />' : 
+            '';
+
+          return '<tr><td class="' + padding + '" style="border: transparent 5px solid;">' +
+            '<div class="zchatbox zcontain ' + alignment + '">' +
+            '<div class="zchathead ' + nicknameAlignment + '">' + i.writer__nickname + deleteLink + '</div>' +
+            imageTag +
+            '<div style="padding: 10px">' + i.text + '</div>' +
+            '</div></td></tr>';
+        };
+
+        var messageHTML = messages.map(buildMessageHTML).join('');
+        tableBody.append(messageHTML);
+      }
+    });
+  };
+  setInterval(refresh, 2000);
+
+  function openimg(id){
+    window.location.href = "/home/open/m/"+parseInt(id)+"/";
+}
+  
+</script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#chatform').on('submit', function(event) {
+      event.preventDefault(); 
+
+      var formData = new FormData(this);
+
+      $.ajax({
+        url: '{% url "ajchat" opp.id %}', 
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        success: function(response) {
+          $('#chatform')[0].reset(); 
+          refresh()
+          setTimeout(zscroll,500)
+        }
+      });
+    });
+  });
+  var zscroll = function(){
+    window.scrollBy(0,200)
+  }
+</script>
+
+
+  <div style="height: 45px"></div>
+  <input type="button" style="width: 0px; height: 0px; position: absolute; margin-left: -50px" id="zend" autofocus />
+
+
+  <input type="button" style="width: 0px; height: 0px; position: absolute; margin-left: -50px" />
+  <div style="
+        z-index: 3;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 40px;
+        background-color: #5c5c5c;
+        color: white;
+      ">
+    <form autocomplete="off" method="post" id="chatform" class="text-white text-center p-1" enctype="multipart/form-data">
+      {%csrf_token%}
+      <input type="file" style="width: 0%; position: absolute" name="image" id="zing" accept="image/*" />
+      <label for="zing" style="color: #00adb5">
+        <i class="fa-solid fa-images zhov-white p-1"></i>
+      </label>
+      <input type="text" id="zchatbar" placeholder="say something" name="text" style="
+            padding-left: 5px;
+            width: 70%;
+            color: white;
+            background-color: #464c56;
+            border-radius: 5px;
+          " maxlength="300" required />
+      <button type="submit" class="btn btn-info p-1" style="height: 25px; width: 50px; border-radius: 10px">
+        <i class="fa-solid fa-paper-plane text-center" style="padding: 2px"></i>
+      </button>
+    </form>
+    <a class="btn btn-info p-1" href="#zend" style="height: 30px; width: 30px; border-radius: 100%;float: inline-end;margin-top: -70px;">
+        <i class="fa-solid fa-angles-down text-center" style="padding: 2px"></i>
+    </a>
+  </div>
+</body>
+
+</html>
